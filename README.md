@@ -1,9 +1,9 @@
-## COVID19
+# COVID19
 
 This repository contains some R scripts to read and analyse the numbers of confirmed, recovered and deaths cases of corona virus COVID-19.
 
 
-# Goals
+## Goals
 
 
 # Scripts
