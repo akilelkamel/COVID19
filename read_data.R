@@ -2,12 +2,12 @@
 # Load packages
 ## For data wrangling and tidying
 library(tidyverse)
-## For clening column names
+
+## For cleaning column names
 library(janitor)
+
 ## For Date manipulation
 library(lubridate)
-## To visualize, wrangle and preprocess time series data
-library(timetk)
 
 # Read raw data for each a given type of cases: "confirmed", "recovered", or "deaths"
 read_raw <- function(cases_type, col_name){  
@@ -30,31 +30,25 @@ read_raw <- function(cases_type, col_name){
 # Get all data and combine it into one data frame.
 read_data <- function(){
 	cases_type <- list("confirmed", "recovered", "deaths")
-	c_titles <- c("confirmed", "recovered", "deaths")
-	map2(cases_type, c_titles, read_raw) %>%
+	col_names <- c("confirmed", "recovered", "deaths")
+	map2(cases_type, col_names, read_raw) %>%
     	reduce(left_join) %>%
-    	rename(country = country_region) %>%
-    	# Here somme corrections for wrong values
-    	# Saudi Arabia on 03/18/2020, number of confirmed cases is 238 not 171
-    	# Tunisia on 03/30/2020, number of confirmed cases is 362 not 312
-    	mutate(confirmed = ifelse(country == "Saudi Arabia" & date == "2020-03-18", 238, confirmed)) %>%
-    	mutate(confirmed = ifelse(country == "Tunisia" & date == "2020-03-30", 362, confirmed))
-}
-
-daily_cases_country <- function(df, type, ctry){
-    data <- df  %>%
-        filter(country == ctry, confirmed > 0) %>%
-        select(date, type)
-    
-    data$confirmed <- c(data$confirmed[1], diff(data$confirmed))
-    return(data)
+    	rename(country = country_region) %>% 
+	    group_by(date, country) %>% 
+	    summarize(confirmed = sum(confirmed, na.rm = TRUE),
+	              recovered = sum(recovered, na.rm = TRUE),
+	              deaths = sum(deaths, na.rm = TRUE)) %>%
+	    ungroup() %>% 
+	    group_by(country) %>% 
+	    mutate(confirmed_daily = c(confirmed[1], diff(confirmed)),
+	           recovered_daily = c(recovered[1], diff(recovered)),
+	           deaths_daily = c(deaths[1], diff(deaths))
+	        
+	    )
 }
 
 df <- read_data()
-country <- "Saudi Arabia"
-data_confirmed_ctry <- daily_cases_country(df, "confirmed", country)
 
-data_confirmed_ctry %>%
-    plot_time_series(date, confirmed, .color_var = month(date),
-                 .interactive = FALSE, .color_lab = "Month", .line_size = 1, .smooth_size = 0.5,
-                 .title = paste("Daily confirmed cases for", country))
+
+read_csv(url) %>% 
+    clean_names()
