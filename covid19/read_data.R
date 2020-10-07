@@ -48,7 +48,3 @@ read_data <- function(){
 }
 
 df <- read_data()
-
-
-read_csv(url) %>% 
-    clean_names()

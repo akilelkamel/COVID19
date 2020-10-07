@@ -1,0 +1,12 @@
+name: covid19
+title: covid19
+username:
+account: elkamel
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2961657
+bundleId: 3712225
+url: https://elkamel.shinyapps.io/covid19/
+when: 1602065280.70793
+asMultiple: FALSE
+asStatic: FALSE
